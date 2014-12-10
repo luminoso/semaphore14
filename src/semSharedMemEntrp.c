@@ -190,6 +190,10 @@ static void prepareToWork (void)
      }
 
   /* insert your code here */
+  
+  sh->fSt.st.entrepStat = 1;        // define a dona da loja como ???
+  sh->fSt.shop.stat = SOPEN;        // abre a loja
+  saveState(nFic, &(sh->fSt));      // grava em nFic (ficheiro). grava a memoria partilhada fST
 
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
      { perror ("error on executing the up operation for semaphore access");
@@ -220,6 +224,8 @@ static char appraiseSit (void)
      }
 
   /* insert your code here */
+  
+  
 
      if (semUp (semgid, sh->access) == -1)                                                   /* exit critical region */
        { perror ("error on executing the up operation for semaphore access");
