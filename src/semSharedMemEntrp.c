@@ -190,10 +190,10 @@ static void prepareToWork (void)
      }
 
   /* insert your code here */
-  
-  sh->fSt.st.entrepStat = 1;        // define a dona da loja como ???
-  sh->fSt.shop.stat = SOPEN;        // abre a loja
-  saveState(nFic, &(sh->fSt));      // grava em nFic (ficheiro). grava a memoria partilhada fST
+
+    sh->fSt.st.entrepStat = WAITING_FOR_NEXT_TASK; // change entrepreneur state
+    sh->fSt.shop.stat = SOPEN; // open the shop
+    saveState(nFic, &(sh->fSt));
 
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
      { perror ("error on executing the up operation for semaphore access");
@@ -224,15 +224,30 @@ static char appraiseSit (void)
      }
 
   /* insert your code here */
+  // senta na cadeira aguardar pedidos de solicitacao - FAZER SLEEP SOBRE A VARIAVEL PROCEED
+  // fazemos isso pondo-a a dormir
   
+  // se fila de espera n tiver vazia return 'C';
+  // se a flag correspondente da chamada do artesao return P
+  // se a flag de recolha estiver verdadeira return G
+  // se (copiar a funcao toda endOperEntrep) sair com 'E' xit
+  // se n for nenhum destes voltas a dormir
   
+  // estrutura repetitiva. em algumas situacoes acorda noutras fica cá
+  // estrutura repetitiva quer dizer: while(true se n for E,G,C,P)
+  
+  /*
+   * while(true)
+   *  se puder decisao
+   *   implica decisao e salta fora
+   */
 
      if (semUp (semgid, sh->access) == -1)                                                   /* exit critical region */
        { perror ("error on executing the up operation for semaphore access");
          exit (EXIT_FAILURE);
        }
 
-  /* insert your code here */
+  /* insert your code here  <---- é aqui bloqueia. ta fora da regiao critica */
 
     if (semDown (semgid, sh->access) == -1)                                                /* enter critical region */
        { perror ("error on executing the down operation for semaphore access");
@@ -265,6 +280,10 @@ static unsigned int addressACustomer (void)
      }
 
   /* insert your code here */
+  // mudar o estado da dona da empresa passa de waitingnextask para attending a customer
+  // ver se a queue esta vazia ou n : se estiver erro de consistencia
+  // devolve a identificacao de um cliente tambem verificando se é valido, sneao inconsistencia
+  // savestate no fim
 
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
      { perror ("error on executing the up operation for semaphore access");
@@ -290,6 +309,9 @@ static void sayGoodByeToCustomer (unsigned int custId)
      }
 
   /* insert your code here */
+  // up no waitforservice[custID]
+  // mudar o estado
+  // save state no fim
 
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
      { perror ("error on executing the up operation for semaphore access");
@@ -358,6 +380,10 @@ static void prepareToLeave (void)
      }
 
   /* insert your code here */
+  // SO MUDANCA DE ESTADO
+  
+  sh->fSt.shop.stat = SCLOSED;
+  saveState (nFic, &(sh->fSt));
 
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
      { perror ("error on executing the up operation for semaphore access");
@@ -379,6 +405,8 @@ static void goToWorkShop (void)
      }
 
   /* insert your code here */
+  // mudar o estado
+  // acordar o numero de artesaos que está em nCraftmemeBlk
 
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
      { perror ("error on executing the up operation for semaphore access");
