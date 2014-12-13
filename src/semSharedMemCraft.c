@@ -171,7 +171,10 @@ static bool collectMaterials (unsigned int craftId)
        exit (EXIT_FAILURE);
      }
 
-  /* insert your code here */
+  bool lol;
+  while(!sh->fSt.workShop.nPMatIn){
+      sh->nCraftsmenBlk++;
+  }
 
     if (semUp (semgid, sh->access) == -1)                                                    /* exit critical region */
        { perror ("error on executing the up operation for semaphore access");
@@ -306,7 +309,8 @@ static void batchReadyForTransfer (unsigned int craftId)
        exit (EXIT_FAILURE);
      }
 
-  /* insert your code here */
+  sh->fSt.st.craftStat[craftId].stat = CONTACTING_THE_ENTREPRENEUR;
+  sh->fSt.shop.prodTransfer = true;
 
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
      { perror ("error on executing the up operation for semaphore access");
