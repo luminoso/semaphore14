@@ -437,6 +437,12 @@ static void goToWorkShop (void)
   /* insert your code here */
   // mudar o estado
   // acordar o numero de artesaos que está em nCraftmemeBlk
+  
+  sh->fSt.st.entrepStat = COLLECTING_A_BATCH_OF_PRODUCTS;
+  sh->fSt.shop.nProdIn += sh->fSt.workShop.nProdIn;
+  sh->fSt.workShop.nProdIn = 0;
+  sh->fSt.shop.prodTransfer = false;
+  saveState(nFic,&(sh->fSt));  
 
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
      { perror ("error on executing the up operation for semaphore access");
