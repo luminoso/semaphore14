@@ -362,13 +362,15 @@ static bool customersInTheShop (void)
      }
 
   /* insert your code here */
+  bool customersInside;
+  customersInside = sh->fSt.shop.nCustIn != 0;
 
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
      { perror ("error on executing the up operation for semaphore access");
        exit (EXIT_FAILURE);
      }
 
-  return false;
+  return customersInside;
 }
 
 /**
