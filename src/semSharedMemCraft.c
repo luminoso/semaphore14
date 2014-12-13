@@ -237,6 +237,8 @@ static void backToWork (unsigned int craftId)
      }
 
   /* insert your code here */
+  sh->fSt.st.craftStat[craftId].stat = FETCHING_PRIME_MATERIALS;
+  saveState(nFic,&(sh->fSt));
 
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
      { perror ("error on executing the up operation for semaphore access");
