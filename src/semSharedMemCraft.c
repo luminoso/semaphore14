@@ -260,6 +260,8 @@ static void prepareToProduce (unsigned int craftId)
      }
 
   /* insert your code here */
+  sh->fSt.st.craftStat[craftId].stat = PRODUCING_A_NEW_PIECE;
+  saveState(nFic,&(sh->fSt));
 
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
      { perror ("error on executing the up operation for semaphore access");
