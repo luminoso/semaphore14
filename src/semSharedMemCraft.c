@@ -196,7 +196,7 @@ static bool collectMaterials(unsigned int craftId) {
     sh->fSt.workShop.nPMatIn--;
     saveState(nFic, &(sh->fSt));
 
-    materialsRequired = (sh->fSt.workShop.NSPMat <= NP) && (sh->fSt.workShop.nPMatIn <= PMIN);
+    materialsRequired = (sh->fSt.workShop.NSPMat < NP) && (sh->fSt.workShop.nPMatIn < PMIN); // menor ou menor igual
 
     if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
         perror("error on executing the up operation for semaphore access");
