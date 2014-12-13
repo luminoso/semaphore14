@@ -469,7 +469,7 @@ static void visitSuppliers (void)
   sh->fSt.st.entrepStat = DELIVERING_PRIME_MATERIALS;
   sh->fSt.shop.primeMatReq = false;
   
-  if(sh->fSt.workShop.NSPMat <= NP){
+  if(sh->fSt.workShop.NSPMat <= NP){ // <= ou <
       sh->fSt.workShop.nPMatIn += sh->fSt.primeMaterials[sh->fSt.workShop.NSPMat];
       sh->fSt.workShop.NTPMat += sh->fSt.primeMaterials[sh->fSt.workShop.NSPMat++];
   }
