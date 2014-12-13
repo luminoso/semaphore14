@@ -285,13 +285,20 @@ static unsigned int goToStore (unsigned int craftId)
      }
 
   /* insert your code here */
+  int nProdIn;
+  sh->fSt.st.craftStat[craftId].stat = STORING_IT_FOR_TRANSFER;
+  sh->fSt.st.craftStat[craftId].prodPieces++;
+  sh->fSt.workShop.nProdIn++;
+  sh->fSt.workShop.NTProd++;
+  saveState(nFic,&(sh->fSt));
+  nProdIn = sh->fSt.workShop.nProdIn;
 
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
      { perror ("error on executing the up operation for semaphore access");
        exit (EXIT_FAILURE);
      }
 
-  return 0;
+  return nProdIn;
 }
 
 /**
