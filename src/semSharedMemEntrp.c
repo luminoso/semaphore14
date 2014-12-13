@@ -284,10 +284,27 @@ static unsigned int addressACustomer (void)
   // ver se a queue esta vazia ou n : se estiver erro de consistencia
   // devolve a identificacao de um cliente tambem verificando se é valido, sneao inconsistencia
   // savestate no fim
+  
+  unsigned int customerIdx;
+  
+  sh->fSt.st.entrepStat = ATTENDING_A_CUSTOMER;
+  if(queueEmpty(sh->fSt.shop.queue)){
+      perror("addressACustomer() - there is no customers in the queue");
+      exit(EXIT_FAILURE);
+  }
+  
+  queueOut(sh->fSt.shop.queue,&customerIdx);
+  
+  if(customerIdx > N){
+      perror("addressACustomer() - customer ID is inconsistent");
+      exit(EXIT_FAILURE);
+  }
+  
+  saveState(nFic,&(sh->fSt));
 
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
      { perror ("error on executing the up operation for semaphore access");
-       exit (EXIT_FAILURE);
+       exit(EXIT_FAILURE);
      }
 
   return 0;
