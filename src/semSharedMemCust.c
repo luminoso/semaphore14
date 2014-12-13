@@ -170,7 +170,7 @@ static void goShopping(unsigned int custId) {
     }
 
     /* insert your code here */
-    sh->fSt.st.custStat[custId] = CHECKING_SHOP_DOOR_OPEN;
+    sh->fSt.st.custStat[custId].stat = CHECKING_SHOP_DOOR_OPEN;
     saveState(nFic,&(sh->fSt));
 
 
@@ -199,7 +199,7 @@ static bool isDoorOpen(unsigned int custId) {
 
     /* insert your code here */
     
-    return sh->fSt.shop.stat == SOPEN
+    return sh->fSt.shop.stat == SOPEN;
 }
 
 /**
@@ -213,7 +213,7 @@ static bool isDoorOpen(unsigned int custId) {
 static void tryAgainLater(unsigned int custId) {
 
     /* insert your code here */
-    sh->fSt.st.custStat[custId] = CARRYING_OUT_DAILY_CHORES;
+    sh->fSt.st.custStat[custId].stat = CARRYING_OUT_DAILY_CHORES;
     saveState(nFic,&(sh->fSt));
 
     if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
@@ -233,7 +233,7 @@ static void tryAgainLater(unsigned int custId) {
 static void enterShop(unsigned int custId) {
 
     /* insert your code here */
-    sh->fSt.st.custStat[custId] = APPRAISING_OFFER_IN_DISPLAY;
+    sh->fSt.st.custStat[custId].stat = APPRAISING_OFFER_IN_DISPLAY;
     sh->fSt.shop.nCustIn++;
     saveState(nFic,&(sh->fSt));
     
