@@ -329,7 +329,16 @@ static void sayGoodByeToCustomer (unsigned int custId)
   // up no waitforservice[custID]
   // mudar o estado
   // save state no fim
-
+  
+  sh->fSt.st.entrepStat = WAITING_FOR_NEXT_TASK;
+  
+  if(semUp(semgid,sh->waitForService[custId]) == -1){
+      perror ("error on executing the down operation for semaphore access");
+      exit (EXIT_FAILURE);
+  }
+  
+  saveState(nFic,&sh->fSt);
+  
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
      { perror ("error on executing the up operation for semaphore access");
        exit (EXIT_FAILURE);
