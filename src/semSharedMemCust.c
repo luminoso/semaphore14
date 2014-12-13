@@ -50,34 +50,35 @@ static int semgid;
 static SHARED_DATA *sh;
 
 /** \brief go shopping operation */
-static void goShopping (unsigned int custId);
+static void goShopping(unsigned int custId);
 
 /** \brief is door open operation */
-static bool isDoorOpen (unsigned int custId);
+static bool isDoorOpen(unsigned int custId);
 
 /** \brief try again later operation */
-static void tryAgainLater (unsigned int custId);
+static void tryAgainLater(unsigned int custId);
 
 /** \brief enter the shop operation */
-static void enterShop (unsigned int custId);
+static void enterShop(unsigned int custId);
 
 /** \brief perusing around operation */
-static unsigned int perusingAround (unsigned int custId);
+static unsigned int perusingAround(unsigned int custId);
 
 /** \brief I want this operation */
-static void iWantThis (unsigned int custId, unsigned int nGoods);
+static void iWantThis(unsigned int custId, unsigned int nGoods);
 
 /** \brief exit the shop operation */
-static void exitShop (unsigned int custId);;
+static void exitShop(unsigned int custId);
+;
 
 /** \brief end of operations customer operation */
-static bool endOperCustomer (unsigned int custId);
+static bool endOperCustomer(unsigned int custId);
 
 /** \brief living normal life [internal] operation */
-static void livingNormalLife (void);
+static void livingNormalLife(void);
 
 /** \brief pick up [internal] operation */
-static unsigned int pickUp (void);
+static unsigned int pickUp(void);
 
 /**
  *  \brief Main program.
@@ -85,75 +86,73 @@ static unsigned int pickUp (void);
  *  Its role is to generate the life cycle of one of intervening entities in the problem: the customer.
  */
 
-int main (int argc, char *argv[])
-{
-  int key;                                                           /*access key to shared memory and semaphore set */
-  char *tinp;                                                                      /* numerical parameters test flag */
-  unsigned int n;                                                                         /* customer identification */
+int main(int argc, char *argv[]) {
+    int key; /*access key to shared memory and semaphore set */
+    char *tinp; /* numerical parameters test flag */
+    unsigned int n; /* customer identification */
 
-  /* validation of comand line parameters */
+    /* validation of comand line parameters */
 
-  if (argc != 5)
-     { freopen ("error_GCT", "a", stderr);
-       fprintf (stderr, "Number of parameters is incorrect!\n");
-       exit (EXIT_FAILURE);
-     }
-     else freopen (argv[4], "w", stderr);
-  n = (unsigned int) strtol (argv[1], &tinp, 0);
-  if ((*tinp != '\0') || (n >= N))
-     { fprintf (stderr, "Customer process id is invalid!\n");
-       exit (EXIT_FAILURE);
-     }
-  nFic = argv[2];
-  key = (unsigned int) strtol (argv[3], &tinp, 0);
-  if (*tinp != '\0')
-     { fprintf (stderr, "Error on the access key communication!\n");
-       exit (EXIT_FAILURE);
-     }
-
-  /* connection to the semaphore set and the shared memory region and mapping the shared region on the process address
-     space */
-
-  if ((semgid = semConnect (key)) == -1)
-     { perror ("error on connecting to the semaphore set");
-       exit (EXIT_FAILURE);
-     }
-  if ((shmid = shmemConnect (key)) == -1)
-     { perror ("error on connecting to the shared memory region");
-       exit (EXIT_FAILURE);
-     }
-  if (shmemAttach (shmid, (void **) &sh) == -1)
-     { perror ("error on mapping the shared region on the process address space");
-       exit (EXIT_FAILURE);
-     }
-
-  /* simulation of the life cycle of the customer */
-
-  unsigned int ng;                                                                       /* number of selected goods */
-
-  while (!endOperCustomer (n))
-  { while (true)
-    { livingNormalLife ();                                                    /* the customer minds his own business */
-      goShopping (n);                                           /* the customer decides to visit the handicraft shop */
-      if (isDoorOpen (n))                                            /* the customer checks if the shop door is open */
-         break;                                                                                             /* it is */
-         else tryAgainLater (n);                    /* it is not, the customer goes back to perform his daily chores */
+    if (argc != 5) {
+        freopen("error_GCT", "a", stderr);
+        fprintf(stderr, "Number of parameters is incorrect!\n");
+        exit(EXIT_FAILURE);
+    } else freopen(argv[4], "w", stderr);
+    n = (unsigned int) strtol(argv[1], &tinp, 0);
+    if ((*tinp != '\0') || (n >= N)) {
+        fprintf(stderr, "Customer process id is invalid!\n");
+        exit(EXIT_FAILURE);
     }
-    enterShop (n);                                                                   /* the customer enters the shop */
-    ng = perusingAround (n);        /* the customer inspects the offer in display and eventually picks up some goods */
-    if (ng != 0)
-       iWantThis (n, ng);                        /* the customer queues by the counter to pay for the selected goods */
-    exitShop (n);                                                                    /* the customer leaves the shop */
-  }
+    nFic = argv[2];
+    key = (unsigned int) strtol(argv[3], &tinp, 0);
+    if (*tinp != '\0') {
+        fprintf(stderr, "Error on the access key communication!\n");
+        exit(EXIT_FAILURE);
+    }
 
-  /* unmapping the shared region off the process address space */
+    /* connection to the semaphore set and the shared memory region and mapping the shared region on the process address
+       space */
 
-  if (shmemDettach (sh) == -1)
-     { perror ("error on unmapping the shared region off the process address space");
-       exit (EXIT_FAILURE);
-     }
+    if ((semgid = semConnect(key)) == -1) {
+        perror("error on connecting to the semaphore set");
+        exit(EXIT_FAILURE);
+    }
+    if ((shmid = shmemConnect(key)) == -1) {
+        perror("error on connecting to the shared memory region");
+        exit(EXIT_FAILURE);
+    }
+    if (shmemAttach(shmid, (void **) &sh) == -1) {
+        perror("error on mapping the shared region on the process address space");
+        exit(EXIT_FAILURE);
+    }
 
-  exit (EXIT_SUCCESS);
+    /* simulation of the life cycle of the customer */
+
+    unsigned int ng; /* number of selected goods */
+
+    while (!endOperCustomer(n)) {
+        while (true) {
+            livingNormalLife(); /* the customer minds his own business */
+            goShopping(n); /* the customer decides to visit the handicraft shop */
+            if (isDoorOpen(n)) /* the customer checks if the shop door is open */
+                break; /* it is */
+            else tryAgainLater(n); /* it is not, the customer goes back to perform his daily chores */
+        }
+        enterShop(n); /* the customer enters the shop */
+        ng = perusingAround(n); /* the customer inspects the offer in display and eventually picks up some goods */
+        if (ng != 0)
+            iWantThis(n, ng); /* the customer queues by the counter to pay for the selected goods */
+        exitShop(n); /* the customer leaves the shop */
+    }
+
+    /* unmapping the shared region off the process address space */
+
+    if (shmemDettach(sh) == -1) {
+        perror("error on unmapping the shared region off the process address space");
+        exit(EXIT_FAILURE);
+    }
+
+    exit(EXIT_SUCCESS);
 }
 
 /**
@@ -164,19 +163,21 @@ int main (int argc, char *argv[])
  *  \param custId identification of the customer
  */
 
-static void goShopping (unsigned int custId)
-{
-  if (semDown (semgid, sh->access) == -1)                                                   /* enter critical region */
-     { perror ("error on executing the down operation for semaphore access");
-       exit (EXIT_FAILURE);
-     }
+static void goShopping(unsigned int custId) {
+    if (semDown(semgid, sh->access) == -1) /* enter critical region */ {
+        perror("error on executing the down operation for semaphore access");
+        exit(EXIT_FAILURE);
+    }
 
-  /* insert your code here */
+    /* insert your code here */
+    sh->fSt.st.custStat[custId] = CHECKING_SHOP_DOOR_OPEN;
+    saveState(nFic,&(sh->fSt));
 
-  if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
-     { perror ("error on executing the up operation for semaphore access");
-       exit (EXIT_FAILURE);
-     }
+
+    if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
+        perror("error on executing the up operation for semaphore access");
+        exit(EXIT_FAILURE);
+    }
 }
 
 /**
@@ -190,16 +191,15 @@ static void goShopping (unsigned int custId)
  *  \return -c false, otherwise
  */
 
-static bool isDoorOpen (unsigned int custId)
-{
-  if (semDown (semgid, sh->access) == -1)                                                   /* enter critical region */
-     { perror ("error on executing the down operation for semaphore access");
-       exit (EXIT_FAILURE);
-     }
+static bool isDoorOpen(unsigned int custId) {
+    if (semDown(semgid, sh->access) == -1) /* enter critical region */ {
+        perror("error on executing the down operation for semaphore access");
+        exit(EXIT_FAILURE);
+    }
 
-  /* insert your code here */
-
-  return true;
+    /* insert your code here */
+    
+    return sh->fSt.shop.stat == SOPEN
 }
 
 /**
@@ -210,15 +210,16 @@ static bool isDoorOpen (unsigned int custId)
  *  \param custId identification of the customer
  */
 
-static void tryAgainLater (unsigned int custId)
-{
+static void tryAgainLater(unsigned int custId) {
 
-  /* insert your code here */
+    /* insert your code here */
+    sh->fSt.st.custStat[custId] = CARRYING_OUT_DAILY_CHORES;
+    saveState(nFic,&(sh->fSt));
 
-  if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
-     { perror ("error on executing the up operation for semaphore access");
-       exit (EXIT_FAILURE);
-     }
+    if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
+        perror("error on executing the up operation for semaphore access");
+        exit(EXIT_FAILURE);
+    }
 }
 
 /**
@@ -229,15 +230,17 @@ static void tryAgainLater (unsigned int custId)
  *  \param custId identification of the customer
  */
 
-static void enterShop (unsigned int custId)
-{
+static void enterShop(unsigned int custId) {
 
-  /* insert your code here */
-
-  if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
-     { perror ("error on executing the up operation for semaphore access");
-       exit (EXIT_FAILURE);
-     }
+    /* insert your code here */
+    sh->fSt.st.custStat[custId] = APPRAISING_OFFER_IN_DISPLAY;
+    sh->fSt.shop.nCustIn++;
+    saveState(nFic,&(sh->fSt));
+    
+    if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
+        perror("error on executing the up operation for semaphore access");
+        exit(EXIT_FAILURE);
+    }
 }
 
 /**
@@ -251,23 +254,29 @@ static void enterShop (unsigned int custId)
  *  \return number of goods to buy
  */
 
-static unsigned int perusingAround (unsigned int custId)
-{
-  if (semDown (semgid, sh->access) == -1)                                                   /* enter critical region */
-     { perror ("error on executing the down operation for semaphore access");
-       exit (EXIT_FAILURE);
-     }
+static unsigned int perusingAround(unsigned int custId) {
+    if (semDown(semgid, sh->access) == -1) /* enter critical region */ {
+        perror("error on executing the down operation for semaphore access");
+        exit(EXIT_FAILURE);
+    }
+    
+    /* insert your code here */
+    unsigned int nProd = 0;
+    
+    if (sh->fSt.shop.nProdIn > 0)
+        nProd = pickUp();
+    
+    if(nProd != 0){
+        sh->fSt.shop.nProdIn -= nProd;
+        saveState (nFic, &(sh->fSt));
+    }
+    
+    if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
+        perror("error on executing the up operation for semaphore access");
+        exit(EXIT_FAILURE);
+    }
 
-
-  /* insert your code here */
-
-
-  if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
-     { perror ("error on executing the up operation for semaphore access");
-       exit (EXIT_FAILURE);
-     }
-
-  return 0;
+    return 0;
 }
 
 /**
@@ -279,21 +288,33 @@ static unsigned int perusingAround (unsigned int custId)
  *  \param nGoods number of selected goods
  */
 
-static void iWantThis (unsigned int custId, unsigned int nGoods)
-{
-  if (semDown (semgid, sh->access) == -1)                                                   /* enter critical region */
-     { perror ("error on executing the down operation for semaphore access");
-       exit (EXIT_FAILURE);
-     }
+static void iWantThis(unsigned int custId, unsigned int nGoods) {
+    if (semDown(semgid, sh->access) == -1) /* enter critical region */ {
+        perror("error on executing the down operation for semaphore access");
+        exit(EXIT_FAILURE);
+    }
 
-  /* insert your code here */
+    /* insert your code here */
+    sh->fSt.st.custStat[custId].stat = BUYING_SOME_GOODS;
+    sh->fSt.st.custStat[custId].boughtPieces += nGoods;
+    queueIn(&(sh->fSt.shop.queue), custId);
 
-  if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
-     { perror ("error on executing the up operation for semaphore access");
-       exit (EXIT_FAILURE);
-     }
+    if (semUp (semgid, sh->proceed) == -1){
+        perror("error on executing the up operation for semaphore proceed");
+        exit(EXIT_FAILURE);
+    }
+    saveState (nFic, &(sh->fSt));
 
-  /* insert your code here */
+    if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
+        perror("error on executing the up operation for semaphore access");
+        exit(EXIT_FAILURE);
+    }
+
+    /* insert your code here */
+    if (semDown(semgid, sh->waitForService[custId]) == -1){
+        perror("error on the executing down operation for semaphore group waitForService");
+        exit(EXIT_FAILURE);
+    }
 
 }
 
@@ -305,19 +326,26 @@ static void iWantThis (unsigned int custId, unsigned int nGoods)
  *  \param custId identification of the customer
  */
 
-static void exitShop (unsigned int custId)
-{
-  if (semDown (semgid, sh->access) == -1)                                                   /* enter critical region */
-     { perror ("error on executing the down operation for semaphore access");
-       exit (EXIT_FAILURE);
-     }
+static void exitShop(unsigned int custId) {
+    if (semDown(semgid, sh->access) == -1) /* enter critical region */ {
+        perror("error on executing the down operation for semaphore access");
+        exit(EXIT_FAILURE);
+    }
 
-  /* insert your code here */
+    /* insert your code here */
+    sh->fSt.st.custStat[custId].stat = CARRYING_OUT_DAILY_CHORES;
+    sh->fSt.shop.nCustIn--;
 
-  if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
-     { perror ("error on executing the up operation for semaphore access");
-       exit (EXIT_FAILURE);
-     }
+    if (semUp (semgid, sh->proceed) == -1){
+        perror("error on executing the up operation for semaphore proceed");
+        exit (EXIT_FAILURE);
+    }
+    saveState (nFic, &(sh->fSt));
+
+    if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
+        perror("error on executing the up operation for semaphore access");
+        exit(EXIT_FAILURE);
+    }
 }
 
 /**
@@ -333,40 +361,39 @@ static void exitShop (unsigned int custId)
  *  \return -c false, otherwise
  */
 
-static bool endOperCustomer (unsigned int custId)
-{
-  bool stat;                                                                                      /* customer status */
-  unsigned int nOpCust,                                                       /* number of customers still operative */
-               i;                                                                               /* counting variable */
+static bool endOperCustomer(unsigned int custId) {
+    bool stat; /* customer status */
+    unsigned int nOpCust, /* number of customers still operative */
+            i; /* counting variable */
 
-  if (semDown (semgid, sh->access) == -1)                                                   /* enter critical region */
-     { perror ("error on executing the down operation for semaphore access");
-       exit (EXIT_FAILURE);
-     }
+    if (semDown(semgid, sh->access) == -1) /* enter critical region */ {
+        perror("error on executing the down operation for semaphore access");
+        exit(EXIT_FAILURE);
+    }
 
-  stat = (sh->fSt.workShop.nPMatIn == 0) &&               /* all prime materials at the workshop have been spent and */
-         (sh->fSt.workShop.NSPMat == NP);               /* all the delivers of prime materials have been carried out */
-  if (stat)
-     { nOpCust = 0;                                               /* find out how many customers are still operative */
-       for (i = 0; i <N; i++)
-         if (sh->fSt.st.custStat[i].readyToWork) nOpCust += 1;
-       stat = (((sh->fSt.shop.nProdIn+sh->fSt.workShop.nProdIn) < 2*nOpCust) &&      /* the amount of products still */
-               (nOpCust != 1)) ||                 /* remaining to be sold is less than the number of customers still
+    stat = (sh->fSt.workShop.nPMatIn == 0) && /* all prime materials at the workshop have been spent and */
+            (sh->fSt.workShop.NSPMat == NP); /* all the delivers of prime materials have been carried out */
+    if (stat) {
+        nOpCust = 0; /* find out how many customers are still operative */
+        for (i = 0; i < N; i++)
+            if (sh->fSt.st.custStat[i].readyToWork) nOpCust += 1;
+        stat = (((sh->fSt.shop.nProdIn + sh->fSt.workShop.nProdIn) < 2 * nOpCust) && /* the amount of products still */
+                (nOpCust != 1)) || /* remaining to be sold is less than the number of customers still
                                                                                                    operative times 2 */
-              ((sh->fSt.shop.nProdIn+sh->fSt.workShop.nProdIn+sh->fSt.workShop.NTPMat-
-                   PP*sh->fSt.workShop.NTProd) == 0);                                         /* or is equal to zero */
-       if (stat)
-          sh->fSt.st.custStat[custId].readyToWork = false;     /* the customer is signaled non operative from now on */
-     }
+                ((sh->fSt.shop.nProdIn + sh->fSt.workShop.nProdIn + sh->fSt.workShop.NTPMat -
+                PP * sh->fSt.workShop.NTProd) == 0); /* or is equal to zero */
+        if (stat)
+            sh->fSt.st.custStat[custId].readyToWork = false; /* the customer is signaled non operative from now on */
+    }
 
-  if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
-     { perror ("error on executing the up operation for semaphore access");
-       exit (EXIT_FAILURE);
-     }
+    if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
+        perror("error on executing the up operation for semaphore access");
+        exit(EXIT_FAILURE);
+    }
 
-  pickUp ();                                 /*         <---            remove this instruction for normal operation */
-  stat = true;                               /*         <---            remove this instruction for normal operation */
-  return stat;
+    pickUp(); /*         <---            remove this instruction for normal operation */
+    stat = true; /*         <---            remove this instruction for normal operation */
+    return stat;
 }
 
 /**
@@ -375,9 +402,8 @@ static bool endOperCustomer (unsigned int custId)
  *  The customer minds his own business for a random generated time interval (internal operation).
  */
 
-static void livingNormalLife (void)
-{
-  usleep((unsigned int) floor (40.0 * random () / RAND_MAX + 1.5));
+static void livingNormalLife(void) {
+    usleep((unsigned int) floor(40.0 * random() / RAND_MAX + 1.5));
 }
 
 /**
@@ -388,12 +414,11 @@ static void livingNormalLife (void)
  *  \return 0, 1 or 2
  */
 
-static unsigned int pickUp (void)
-{
-  unsigned long val;                                                                           /* auxiliary variable */
+static unsigned int pickUp(void) {
+    unsigned long val; /* auxiliary variable */
 
-  val = (unsigned long) random ();
-  if ((val < (unsigned long) floor (0.3*RAND_MAX)) || (sh->fSt.shop.nProdIn == 0)) return 0;
-     else if ((val < (unsigned long) floor (0.7*RAND_MAX)) || (sh->fSt.shop.nProdIn == 1)) return 1;
-             else return 2;
+    val = (unsigned long) random();
+    if ((val < (unsigned long) floor(0.3 * RAND_MAX)) || (sh->fSt.shop.nProdIn == 0)) return 0;
+    else if ((val < (unsigned long) floor(0.7 * RAND_MAX)) || (sh->fSt.shop.nProdIn == 1)) return 1;
+    else return 2;
 }
