@@ -214,60 +214,60 @@ static void prepareToWork(void) {
  */
 
 static char appraiseSit(void) {
-    if (semDown (semgid, sh->access) == -1)                                                   / enter critical region /
-     { perror ("error on executing the down operation for semaphore access");
-       exit (EXIT_FAILURE);
-     }
-
-  / insert your code here /
-  char nextTask = 'E';
-  
-  while((sh->fSt.shop.nCustIn == 0) &&                                          / the shop has no customers in and /
-         (sh->fSt.shop.nProdIn == 0) &&                                / all products in display have been sold and /
-         !sh->fSt.shop.primeMatReq &&                       / no craftsman has phoned to request prime materials or /
-         !sh->fSt.shop.prodTransfer &&                         / to ask for a batch of products to be collected and /
-         (sh->fSt.workShop.nProdIn == 0) &&   / there are no finished products in the storeroom at the workshop and /
-         (sh->fSt.workShop.nPMatIn == 0) &&               / all prime materials at the workshop have been spent and /
-         (sh->fSt.workShop.NSPMat == NP) &&         / all the delivers of prime materials have been carried out and /
-         (sh->fSt.workShop.NTPMat == PP*sh->fSt.workShop.NTProd)){
-
-    if (semUp (semgid, sh->access) == -1)                                                   / exit critical region /
-       { perror ("error on executing the up operation for semaphore access");
-         exit (EXIT_FAILURE);
-       }
-
-    if (semDown (semgid, sh->proceed) == -1)                                                  
-       { perror ("error on executing the down operation for semaphore proceed");
-         exit (EXIT_FAILURE);
-       }
-
-    if (semDown (semgid, sh->access) == -1)                                                / enter critical region /
-       { perror ("error on executing the down operation for semaphore access");
-         exit (EXIT_FAILURE);
-       }
-
-    if(!queueEmpty(&sh->fSt.shop.queue)){
-      nextTask = 'C';
-      break;
+    if(semDown(semgid, sh->access) == -1) /* enter critical region */ {
+        perror("error on executing the down operation for semaphore access");
+        exit(EXIT_FAILURE);
     }
-    if(sh->fSt.shop.primeMatReq){
-      nextTask = 'P';
-      break;
+
+    /* insert your code here */
+    char nextTask = 'E';
+
+    while ((sh->fSt.shop.nCustIn == 0) && /* the shop has no customers in and */
+            (sh->fSt.shop.nProdIn == 0) && /* all products in display have been sold and */
+            !sh->fSt.shop.primeMatReq && /* no craftsman has phoned to request prime materials or */
+            !sh->fSt.shop.prodTransfer && /* to ask for a batch of products to be collected and */
+                (sh->fSt.workShop.nProdIn == 0) && /* there are no finished products in the storeroom at the workshop and */
+                (sh->fSt.workShop.nPMatIn == 0) && /* all prime materials at the workshop have been spent and */
+                (sh->fSt.workShop.NSPMat == NP) && /* all the delivers of prime materials have been carried out and */
+                (sh->fSt.workShop.NTPMat == PP*sh->fSt.workShop.NTProd)) {
+
+            if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
+                perror("error on executing the up operation for semaphore access");
+                exit(EXIT_FAILURE);
+            }
+
+            if (semDown(semgid, sh->proceed) == -1) {
+                perror("error on executing the down operation for semaphore proceed");
+                exit(EXIT_FAILURE);
+            }
+
+            if (semDown(semgid, sh->access) == -1) /* enter critical region */ {
+                perror("error on executing the down operation for semaphore access");
+                exit(EXIT_FAILURE);
+            }
+
+            if (!queueEmpty(&sh->fSt.shop.queue)) {
+                nextTask = 'C';
+                break;
+            }
+            if (sh->fSt.shop.primeMatReq) {
+                nextTask = 'P';
+                break;
+            }
+            if (sh->fSt.shop.prodTransfer) {
+                nextTask = 'G';
+                break;
+            }
+        }
+    /* insert your code here */
+
+
+    if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
+        perror("error on executing the up operation for semaphore access");
+        exit(EXIT_FAILURE);
     }
-    if(sh->fSt.shop.prodTransfer){
-      nextTask = 'G';
-      break;
-    }
-  }
-  /* insert your code here */
 
-
-  if (semUp (semgid, sh->access) == -1)                                                     / exit critical region /
-     { perror ("error on executing the up operation for semaphore access");
-       exit (EXIT_FAILURE);
-     }
-
-  return nextTask;
+    return nextTask;
 }
 
 /**
