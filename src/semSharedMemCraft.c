@@ -311,7 +311,14 @@ static void batchReadyForTransfer (unsigned int craftId)
 
   sh->fSt.st.craftStat[craftId].stat = CONTACTING_THE_ENTREPRENEUR;
   sh->fSt.shop.prodTransfer = true;
+  
+  if(semUp(semgid,sh->proceed) == -1){
+      perror("batchReadyForTransfer() error while semUp sh->proceed");
+      exit(EXIT_FAILURE);
+  }
 
+  saveState(nFic,&(sh->fSt));
+  
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
      { perror ("error on executing the up operation for semaphore access");
        exit (EXIT_FAILURE);
