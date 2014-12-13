@@ -171,7 +171,8 @@ static bool collectMaterials (unsigned int craftId)
        exit (EXIT_FAILURE);
      }
 
-  bool lol;
+  bool materialsRequired;
+  
   while(!sh->fSt.workShop.nPMatIn){
       sh->nCraftsmenBlk++;
   }
@@ -182,6 +183,10 @@ static bool collectMaterials (unsigned int craftId)
        }
 
   /* insert your code here */
+  if( semDown(semgid,sh->waitForMaterials) == -1){
+      perror("collectMaterials() error during semDown waitformaterials");
+      exit(EXIT_FAILURE);
+  }
 
     if (semDown (semgid, sh->access) == -1)                                                 /* enter critical region */
        { perror ("error on executing the down operation for semaphore access");
@@ -189,13 +194,17 @@ static bool collectMaterials (unsigned int craftId)
        }
 
   /* insert your code here */
+  sh->fSt.workShop.nPMatIn--;
+  saveState(nFic,&(sh->fSt));
 
+  materialsRequired = (sh->fSt.workShop.NSPMat <= NP) && (sh->fSt.workShop.nPMatIn <= PMIN);
+  
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
      { perror ("error on executing the up operation for semaphore access");
        exit (EXIT_FAILURE);
      }
 
-  return true;
+  return materialsRequired;
 }
 
 /**
