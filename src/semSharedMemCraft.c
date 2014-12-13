@@ -164,47 +164,46 @@ int main (int argc, char *argv[])
  *    FALSE, otherwise
  */
 
-static bool collectMaterials (unsigned int craftId)
-{
-  if (semDown (semgid, sh->access) == -1)                                                   /* enter critical region */
-     { perror ("error on executing the down operation for semaphore access");
-       exit (EXIT_FAILURE);
-     }
+static bool collectMaterials(unsigned int craftId) {
+    if (semDown(semgid, sh->access) == -1) /* enter critical region */ {
+        perror("error on executing the down operation for semaphore access");
+        exit(EXIT_FAILURE);
+    }
 
-  bool materialsRequired;
-  
-  while(!sh->fSt.workShop.nPMatIn){
-      sh->nCraftsmenBlk++;
-  }
+    bool materialsRequired;
 
-    if (semUp (semgid, sh->access) == -1)                                                    /* exit critical region */
-       { perror ("error on executing the up operation for semaphore access");
-         exit (EXIT_FAILURE);
-       }
+    while (!sh->fSt.workShop.nPMatIn) {
+        sh->nCraftsmenBlk++;
 
-  /* insert your code here */
-  if( semDown(semgid,sh->waitForMaterials) == -1){
-      perror("collectMaterials() error during semDown waitformaterials");
-      exit(EXIT_FAILURE);
-  }
+        if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
+            perror("error on executing the up operation for semaphore access");
+            exit(EXIT_FAILURE);
+        }
 
-    if (semDown (semgid, sh->access) == -1)                                                 /* enter critical region */
-       { perror ("error on executing the down operation for semaphore access");
-         exit (EXIT_FAILURE);
-       }
+        /* insert your code here */
+        if (semDown(semgid, sh->waitForMaterials) == -1) {
+            perror("collectMaterials() error during semDown waitformaterials");
+            exit(EXIT_FAILURE);
+        }
 
-  /* insert your code here */
-  sh->fSt.workShop.nPMatIn--;
-  saveState(nFic,&(sh->fSt));
+        if (semDown(semgid, sh->access) == -1) /* enter critical region */ {
+            perror("error on executing the down operation for semaphore access");
+            exit(EXIT_FAILURE);
+        }
+    }
 
-  materialsRequired = (sh->fSt.workShop.NSPMat <= NP) && (sh->fSt.workShop.nPMatIn <= PMIN);
-  
-  if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
-     { perror ("error on executing the up operation for semaphore access");
-       exit (EXIT_FAILURE);
-     }
+    /* insert your code here */
+    sh->fSt.workShop.nPMatIn--;
+    saveState(nFic, &(sh->fSt));
 
-  return materialsRequired;
+    materialsRequired = (sh->fSt.workShop.NSPMat <= NP) && (sh->fSt.workShop.nPMatIn <= PMIN);
+
+    if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
+        perror("error on executing the up operation for semaphore access");
+        exit(EXIT_FAILURE);
+    }
+
+    return materialsRequired;
 }
 
 /**
