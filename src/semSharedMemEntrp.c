@@ -295,7 +295,7 @@ static unsigned int addressACustomer (void)
   
   queueOut(&(sh->fSt.shop.queue),&customerIdx);
   
-  if(customerIdx > N){
+  if(customerIdx >= N){
       perror("addressACustomer() - customer ID is inconsistent");
       exit(EXIT_FAILURE);
   }
@@ -307,7 +307,7 @@ static unsigned int addressACustomer (void)
        exit(EXIT_FAILURE);
      }
 
-  return 0;
+  return customerIdx;
 }
 
 /**
@@ -464,6 +464,11 @@ static void visitSuppliers (void)
      }
 
   /* insert your code here */
+  unsigned int lol;
+  sh->fSt.st.entrepStat = DELIVERING_PRIME_MATERIALS;
+  sh->fSt.shop.primeMatReq = false;
+  
+  if(sh->fSt.workShop.NSPMat <= )
 
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
      { perror ("error on executing the up operation for semaphore access");
