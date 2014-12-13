@@ -413,6 +413,7 @@ static void prepareToLeave (void)
   // SO MUDANCA DE ESTADO
   
   sh->fSt.shop.stat = SCLOSED;
+  sh->fSt.st.entrepStat = CLOSING_THE_SHOP;
   saveState (nFic, &(sh->fSt));
 
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
@@ -476,7 +477,7 @@ static void visitSuppliers (void)
   
   craftmenCounter = 0;
   
-  while(sh->nCraftsmenBlk > 0){
+  while(sh->nCraftsmenBlk > craftmenCounter){
       // fazer nCraftsmenBlk vezes up a um semaforo?
       if (semUp(semgid,sh->waitForMaterials) == -1){
           perror("visitSuppliers() error during semUP waiting for materials");
