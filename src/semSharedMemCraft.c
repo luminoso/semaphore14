@@ -214,6 +214,15 @@ static void primeMaterialsNeeded (unsigned int craftId)
      }
 
   /* insert your code here */
+  sh->fSt.st.craftStat[craftId].stat = CONTACTING_THE_ENTREPRENEUR;
+  sh->fSt.shop.primeMatReq = true;
+  
+  if(semUp(semgid,sh->proceed) == -1){
+      perror("primeMaterialsNeeded() error during semUp() for proceed");
+      exit (EXIT_FAILURE);
+  }
+  
+  saveState(nFic,&(sh->fSt));
 
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
      { perror ("error on executing the up operation for semaphore access");
