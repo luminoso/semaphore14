@@ -288,12 +288,12 @@ static unsigned int addressACustomer (void)
   unsigned int customerIdx;
   
   sh->fSt.st.entrepStat = ATTENDING_A_CUSTOMER;
-  if(queueEmpty(sh->fSt.shop.queue)){
+  if(queueEmpty(&(sh->fSt.shop.queue))){
       perror("addressACustomer() - there is no customers in the queue");
       exit(EXIT_FAILURE);
   }
   
-  queueOut(sh->fSt.shop.queue,&customerIdx);
+  queueOut(&(sh->fSt.shop.queue),&customerIdx);
   
   if(customerIdx > N){
       perror("addressACustomer() - customer ID is inconsistent");
