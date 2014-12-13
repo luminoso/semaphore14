@@ -276,7 +276,7 @@ static unsigned int perusingAround(unsigned int custId) {
         exit(EXIT_FAILURE);
     }
 
-    return 0;
+    return nProd;
 }
 
 /**
