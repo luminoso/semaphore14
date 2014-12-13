@@ -405,7 +405,7 @@ static bool endOperCraftsman (unsigned int craftId)
        exit (EXIT_FAILURE);
      }
 
-  stat = true;                               /*         <---            remove this instruction for normal operation */
+  //stat = true;                               /*         <---            remove this instruction for normal operation */
   return stat;
 }
 

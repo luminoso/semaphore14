@@ -551,7 +551,7 @@ static bool endOperEntrep(void) {
         exit(EXIT_FAILURE);
     }
 
-    stat = true; /*         <---            remove this instruction for normal operation */
+    //stat = true; /*         <---            remove this instruction for normal operation */
     return stat;
 }
 

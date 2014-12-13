@@ -391,8 +391,8 @@ static bool endOperCustomer(unsigned int custId) {
         exit(EXIT_FAILURE);
     }
 
-    pickUp(); /*         <---            remove this instruction for normal operation */
-    stat = true; /*         <---            remove this instruction for normal operation */
+    //pickUp(); /*         <---            remove this instruction for normal operation */
+    //stat = true; /*         <---            remove this instruction for normal operation */
     return stat;
 }
 
