@@ -464,11 +464,29 @@ static void visitSuppliers (void)
      }
 
   /* insert your code here */
-  unsigned int lol;
+  unsigned int craftmenCounter;
+  
   sh->fSt.st.entrepStat = DELIVERING_PRIME_MATERIALS;
   sh->fSt.shop.primeMatReq = false;
   
-  if(sh->fSt.workShop.NSPMat <= )
+  if(sh->fSt.workShop.NSPMat <= NP){
+      sh->fSt.workShop.nPMatIn += sh->fSt.primeMaterials[sh->fSt.workShop.NSPMat];
+      sh->fSt.workShop.NTPMat += sh->fSt.primeMaterials[sh->fSt.workShop.NSPMat++];
+  }
+  
+  craftmenCounter = 0;
+  
+  while(sh->nCraftsmenBlk > 0){
+      // fazer nCraftsmenBlk vezes up a um semaforo?
+      if (semUp(semgid,sh->waitForMaterials) == -1){
+          perror("visitSuppliers() error during semUP waiting for materials");
+          exit(EXIT_FAILURE);
+      }
+      craftmenCounter++;
+  }
+  
+  sh->nCraftsmenBlk = 0;
+  saveState(nFic,&(sh->fSt));
 
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
      { perror ("error on executing the up operation for semaphore access");
