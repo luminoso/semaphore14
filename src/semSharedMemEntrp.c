@@ -387,6 +387,8 @@ static void closeTheDoor (void)
      }
 
   /* insert your code here */
+  sh->fSt.shop.stat = SDCLOSED;
+  saveState(nFic,&(sh->fSt));
 
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
      { perror ("error on executing the up operation for semaphore access");
