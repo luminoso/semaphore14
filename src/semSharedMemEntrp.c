@@ -187,7 +187,8 @@ static void prepareToWork(void) {
     }
 
     /* insert your code here */
-
+    printf("preparetowork() \n");
+    
     sh->fSt.st.entrepStat = WAITING_FOR_NEXT_TASK; // change entrepreneur state
     sh->fSt.shop.stat = SOPEN; // open the shop
     saveState(nFic, &(sh->fSt));
@@ -214,7 +215,7 @@ static void prepareToWork(void) {
  */
 
 static char appraiseSit(void) {
-    if(semDown(semgid, sh->access) == -1) /* enter critical region */ {
+    if (semDown(semgid, sh->access) == -1) /* enter critical region */ {
         perror("error on executing the down operation for semaphore access");
         exit(EXIT_FAILURE);
     }
@@ -222,44 +223,55 @@ static char appraiseSit(void) {
     /* insert your code here */
     char nextTask = 'E';
 
-    while ((sh->fSt.shop.nCustIn == 0) && /* the shop has no customers in and */
+    printf("appraisesit() \n");
+    printf("=====================================\n");
+    printf("ncustIn: %i \n"
+            "nProdIn: %i \n"
+            "primeMatreq: %i \n"
+            "prodTransfer: %i \n"
+            "nProdIn: %i \n"
+            "NSPMat: %i == %i\n"
+            "NTPMat: %i == %i (PP)* NTProd: %i (igual a %i)\n", sh->fSt.shop.nCustIn, sh->fSt.shop.nProdIn, sh->fSt.shop.primeMatReq, sh->fSt.shop.prodTransfer, sh->fSt.workShop.nProdIn,
+            sh->fSt.workShop.nPMatIn, sh->fSt.workShop.NSPMat, sh->fSt.workShop.NTPMat, NP, sh->fSt.workShop.NTProd, PP * sh->fSt.workShop.NTProd);
+    printf("=====================================\n");
+    do {
+        printf("appraisesit() dowhile\n");
+        if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
+            perror("error on executing the up operation for semaphore access");
+            exit(EXIT_FAILURE);
+        }
+
+        if (semDown(semgid, sh->proceed) == -1) {
+            perror("error on executing the down operation for semaphore proceed");
+            exit(EXIT_FAILURE);
+        }
+
+        if (semDown(semgid, sh->access) == -1) /* enter critical region */ {
+            perror("error on executing the down operation for semaphore access");
+            exit(EXIT_FAILURE);
+        }
+
+        if (!queueEmpty(&sh->fSt.shop.queue)) {
+            nextTask = 'C';
+            break;
+        }
+        if (sh->fSt.shop.primeMatReq) {
+            nextTask = 'P';
+            break;
+        }
+        if (sh->fSt.shop.prodTransfer) {
+            nextTask = 'G';
+            break;
+        }
+
+    } while ((sh->fSt.shop.nCustIn == 0) && /* the shop has no customers in and */
             (sh->fSt.shop.nProdIn == 0) && /* all products in display have been sold and */
             !sh->fSt.shop.primeMatReq && /* no craftsman has phoned to request prime materials or */
             !sh->fSt.shop.prodTransfer && /* to ask for a batch of products to be collected and */
-                (sh->fSt.workShop.nProdIn == 0) && /* there are no finished products in the storeroom at the workshop and */
-                (sh->fSt.workShop.nPMatIn == 0) && /* all prime materials at the workshop have been spent and */
-                (sh->fSt.workShop.NSPMat == NP) && /* all the delivers of prime materials have been carried out and */
-                (sh->fSt.workShop.NTPMat == PP*sh->fSt.workShop.NTProd)) {
-
-            if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
-                perror("error on executing the up operation for semaphore access");
-                exit(EXIT_FAILURE);
-            }
-
-            if (semDown(semgid, sh->proceed) == -1) {
-                perror("error on executing the down operation for semaphore proceed");
-                exit(EXIT_FAILURE);
-            }
-
-            if (semDown(semgid, sh->access) == -1) /* enter critical region */ {
-                perror("error on executing the down operation for semaphore access");
-                exit(EXIT_FAILURE);
-            }
-
-            if (!queueEmpty(&sh->fSt.shop.queue)) {
-                nextTask = 'C';
-                break;
-            }
-            if (sh->fSt.shop.primeMatReq) {
-                nextTask = 'P';
-                break;
-            }
-            if (sh->fSt.shop.prodTransfer) {
-                nextTask = 'G';
-                break;
-            }
-        }
-    /* insert your code here */
+            (sh->fSt.workShop.nProdIn == 0) && /* there are no finished products in the storeroom at the workshop and */
+            (sh->fSt.workShop.nPMatIn == 0) && /* all prime materials at the workshop have been spent and */
+            (sh->fSt.workShop.NSPMat == NP) && /* all the delivers of prime materials have been carried out and */
+            (sh->fSt.workShop.NTPMat == PP * sh->fSt.workShop.NTProd));
 
 
     if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
@@ -267,6 +279,7 @@ static char appraiseSit(void) {
         exit(EXIT_FAILURE);
     }
 
+    printf("appraiseSit(): return: %c \n", nextTask);
     return nextTask;
 }
 
@@ -290,9 +303,10 @@ static unsigned int addressACustomer(void) {
     // devolve a identificacao de um cliente tambem verificando se é valido, sneao inconsistencia
     // savestate no fim
 
-    unsigned int customerIdx;
+    unsigned int customerIdx; // customer id 
 
     sh->fSt.st.entrepStat = ATTENDING_A_CUSTOMER;
+    
     if (queueEmpty(&(sh->fSt.shop.queue))) {
         perror("addressACustomer() - there is no customers in the queue");
         exit(EXIT_FAILURE);
