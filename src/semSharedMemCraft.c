@@ -193,7 +193,7 @@ static bool collectMaterials(unsigned int craftId) {
     }
 
     /* insert your code here */
-    sh->fSt.workShop.nPMatIn--;
+    sh->fSt.workShop.nPMatIn -= PP;
     saveState(nFic, &(sh->fSt));
 
     materialsRequired = (sh->fSt.workShop.nPMatIn < PMIN); // menor ou menor igual
