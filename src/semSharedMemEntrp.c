@@ -264,8 +264,7 @@ static char appraiseSit(void) {
             nextTask = 'E';
             break;
         }
-
-    };
+    }
 
     if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
         perror("error on executing the up operation for semaphore access");
