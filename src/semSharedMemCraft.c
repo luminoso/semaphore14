@@ -196,7 +196,7 @@ static bool collectMaterials(unsigned int craftId) {
     sh->fSt.workShop.nPMatIn--;
     saveState(nFic, &(sh->fSt));
 
-    materialsRequired = (sh->fSt.workShop.NSPMat < NP) && (sh->fSt.workShop.nPMatIn < PMIN); // menor ou menor igual
+    materialsRequired = (sh->fSt.workShop.nPMatIn < PMIN); // menor ou menor igual
 
     if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
         perror("error on executing the up operation for semaphore access");
@@ -224,12 +224,12 @@ static void primeMaterialsNeeded (unsigned int craftId)
   /* insert your code here */
   sh->fSt.st.craftStat[craftId].stat = CONTACTING_THE_ENTREPRENEUR;
   sh->fSt.shop.primeMatReq = true;
-  
+
   if(semUp(semgid,sh->proceed) == -1){
       perror("primeMaterialsNeeded() error during semUp() for proceed");
       exit (EXIT_FAILURE);
   }
-  
+
   saveState(nFic,&(sh->fSt));
 
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
@@ -339,14 +339,14 @@ static void batchReadyForTransfer (unsigned int craftId)
 
   sh->fSt.st.craftStat[craftId].stat = CONTACTING_THE_ENTREPRENEUR;
   sh->fSt.shop.prodTransfer = true;
-  
+
   if(semUp(semgid,sh->proceed) == -1){
       perror("batchReadyForTransfer() error while semUp sh->proceed");
       exit(EXIT_FAILURE);
   }
 
   saveState(nFic,&(sh->fSt));
-  
+
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
      { perror ("error on executing the up operation for semaphore access");
        exit (EXIT_FAILURE);
