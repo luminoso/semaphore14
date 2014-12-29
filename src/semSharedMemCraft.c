@@ -170,7 +170,7 @@ static bool collectMaterials(unsigned int craftId) {
         exit(EXIT_FAILURE);
     }
 
-    bool materialsRequired;
+    bool materialsRequired; // return control variable if materials are needed
 
     while (!sh->fSt.workShop.nPMatIn) {
         sh->nCraftsmenBlk++;
@@ -193,10 +193,10 @@ static bool collectMaterials(unsigned int craftId) {
     }
 
     /* insert your code here */
-    sh->fSt.workShop.nPMatIn -= PP;
+    sh->fSt.workShop.nPMatIn -= PP; // collect the number of materials needed to produce an piece
     saveState(nFic, &(sh->fSt));
 
-    materialsRequired = (sh->fSt.workShop.nPMatIn < PMIN); // menor ou menor igual
+    materialsRequired = (sh->fSt.workShop.nPMatIn < PMIN); // check if the number of materials available are too low
 
     if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
         perror("error on executing the up operation for semaphore access");
@@ -222,8 +222,8 @@ static void primeMaterialsNeeded (unsigned int craftId)
      }
 
   /* insert your code here */
-  sh->fSt.st.craftStat[craftId].stat = CONTACTING_THE_ENTREPRENEUR;
-  sh->fSt.shop.primeMatReq = true;
+  sh->fSt.st.craftStat[craftId].stat = CONTACTING_THE_ENTREPRENEUR; // state change
+  sh->fSt.shop.primeMatReq = true; // materials are needed
 
   if(semUp(semgid,sh->proceed) == -1){
       perror("primeMaterialsNeeded() error during semUp() for proceed");
@@ -279,7 +279,7 @@ static void prepareToProduce (unsigned int craftId)
      }
 
   /* insert your code here */
-  sh->fSt.st.craftStat[craftId].stat = PRODUCING_A_NEW_PIECE;
+  sh->fSt.st.craftStat[craftId].stat = PRODUCING_A_NEW_PIECE; // state change
   saveState(nFic,&(sh->fSt));
 
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
@@ -306,13 +306,14 @@ static unsigned int goToStore (unsigned int craftId)
      }
 
   /* insert your code here */
-  int nProdIn;
-  sh->fSt.st.craftStat[craftId].stat = STORING_IT_FOR_TRANSFER;
-  sh->fSt.st.craftStat[craftId].prodPieces++;
-  sh->fSt.workShop.nProdIn++;
-  sh->fSt.workShop.NTProd++;
+  int nProdIn; // variable return the correct value of materials
+  sh->fSt.st.craftStat[craftId].stat = STORING_IT_FOR_TRANSFER; // state change
+  sh->fSt.st.craftStat[craftId].prodPieces++; // one more unit produced by this craftsman
+  sh->fSt.workShop.nProdIn++; // one more unit ready to sell
+  sh->fSt.workShop.NTProd++; // one more unite produced globally 
   saveState(nFic,&(sh->fSt));
-  nProdIn = sh->fSt.workShop.nProdIn;
+  
+  nProdIn = sh->fSt.workShop.nProdIn; // update return variable
 
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
      { perror ("error on executing the up operation for semaphore access");
@@ -337,8 +338,8 @@ static void batchReadyForTransfer (unsigned int craftId)
        exit (EXIT_FAILURE);
      }
 
-  sh->fSt.st.craftStat[craftId].stat = CONTACTING_THE_ENTREPRENEUR;
-  sh->fSt.shop.prodTransfer = true;
+  sh->fSt.st.craftStat[craftId].stat = CONTACTING_THE_ENTREPRENEUR; // state change
+  sh->fSt.shop.prodTransfer = true; // ready for transfer
 
   if(semUp(semgid,sh->proceed) == -1){
       perror("batchReadyForTransfer() error while semUp sh->proceed");
