@@ -254,7 +254,7 @@ static void backToWork (unsigned int craftId)
      }
 
   /* insert your code here */
-  sh->fSt.st.craftStat[craftId].stat = FETCHING_PRIME_MATERIALS;
+  sh->fSt.st.craftStat[craftId].stat = FETCHING_PRIME_MATERIALS; // change state
   saveState(nFic,&(sh->fSt));
 
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
@@ -310,9 +310,9 @@ static unsigned int goToStore (unsigned int craftId)
   sh->fSt.st.craftStat[craftId].stat = STORING_IT_FOR_TRANSFER; // state change
   sh->fSt.st.craftStat[craftId].prodPieces++; // one more unit produced by this craftsman
   sh->fSt.workShop.nProdIn++; // one more unit ready to sell
-  sh->fSt.workShop.NTProd++; // one more unite produced globally 
+  sh->fSt.workShop.NTProd++; // one more unite produced globally
   saveState(nFic,&(sh->fSt));
-  
+
   nProdIn = sh->fSt.workShop.nProdIn; // update return variable
 
   if (semUp (semgid, sh->access) == -1)                                                      /* exit critical region */
