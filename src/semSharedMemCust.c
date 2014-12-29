@@ -198,8 +198,8 @@ static bool isDoorOpen(unsigned int custId) {
     }
 
     /* insert your code here */
-    
-    return sh->fSt.shop.stat == SOPEN;
+
+    return sh->fSt.shop.stat == SOPEN; //change state
 }
 
 /**
@@ -233,10 +233,10 @@ static void tryAgainLater(unsigned int custId) {
 static void enterShop(unsigned int custId) {
 
     /* insert your code here */
-    sh->fSt.st.custStat[custId].stat = APPRAISING_OFFER_IN_DISPLAY;
+    sh->fSt.st.custStat[custId].stat = APPRAISING_OFFER_IN_DISPLAY; // change state
     sh->fSt.shop.nCustIn++; // one more customer in the shop
     saveState(nFic,&(sh->fSt));
-    
+
     if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
         perror("error on executing the up operation for semaphore access");
         exit(EXIT_FAILURE);
@@ -259,18 +259,18 @@ static unsigned int perusingAround(unsigned int custId) {
         perror("error on executing the down operation for semaphore access");
         exit(EXIT_FAILURE);
     }
-    
+
     /* insert your code here */
     unsigned int nProd = 0; // number of pieces picked up
-    
+
     if (sh->fSt.shop.nProdIn > 0) // is there anything to buy?
         nProd = pickUp(); // randomly pick something or not
-    
+
     if(nProd != 0){
         sh->fSt.shop.nProdIn -= nProd; // customer picked nProd pieces
         saveState (nFic, &(sh->fSt));
     }
-    
+
     if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
         perror("error on executing the up operation for semaphore access");
         exit(EXIT_FAILURE);

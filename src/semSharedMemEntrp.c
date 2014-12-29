@@ -187,7 +187,7 @@ static void prepareToWork(void) {
     }
 
     /* insert your code here */
-    
+
     sh->fSt.st.entrepStat = WAITING_FOR_NEXT_TASK; // change entrepreneur state
     sh->fSt.shop.stat = SOPEN; // open the shop
     saveState(nFic, &(sh->fSt));
@@ -242,12 +242,12 @@ static char appraiseSit(void) {
             nextTask = 'C'; // attend the customer
             break;
         }
-        
+
         if (sh->fSt.shop.primeMatReq) {
             nextTask = 'P'; // prime materials needed
             break;
         }
-        
+
         if (sh->fSt.shop.prodTransfer) {
             nextTask = 'G'; // go to workshop collect pieces
             break;
@@ -294,10 +294,10 @@ static unsigned int addressACustomer(void) {
     // devolve a identificacao de um cliente tambem verificando se é valido, sneao inconsistencia
     // savestate no fim
 
-    unsigned int customerIdx; // customer id 
+    unsigned int customerIdx; // customer id
 
     sh->fSt.st.entrepStat = ATTENDING_A_CUSTOMER; // change state
-    
+
     if (queueEmpty(&(sh->fSt.shop.queue))) {
         perror("addressACustomer() - there is no customers in the queue");
         exit(EXIT_FAILURE);
@@ -305,7 +305,7 @@ static unsigned int addressACustomer(void) {
 
     queueOut(&(sh->fSt.shop.queue), &customerIdx); // retrieve a value from the queue to customerIdx
 
-    if (customerIdx >= N) {
+    if (customerIdx >= N) { // quick check customerIdx consistency
         perror("addressACustomer() - customer ID is inconsistent");
         exit(EXIT_FAILURE);
     }
@@ -339,7 +339,7 @@ static void sayGoodByeToCustomer(unsigned int custId) {
     // mudar o estado
     // save state no fim
 
-    sh->fSt.st.entrepStat = WAITING_FOR_NEXT_TASK;
+    sh->fSt.st.entrepStat = WAITING_FOR_NEXT_TASK; // change state
 
     if (semUp(semgid, sh->waitForService[custId]) == -1) {
         perror("error on executing the down operation for semaphore access");
@@ -371,7 +371,7 @@ static bool customersInTheShop(void) {
 
     /* insert your code here */
     bool customersInside; // control variable if there are customers in the shop
-    
+
     customersInside = sh->fSt.shop.nCustIn != 0; // check clients in the shop status
 
     if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
@@ -445,10 +445,10 @@ static void goToWorkShop(void) {
     // mudar o estado
     // acordar o numero de artesaos que está em nCraftmemeBlk
 
-    sh->fSt.st.entrepStat = COLLECTING_A_BATCH_OF_PRODUCTS;
-    sh->fSt.shop.nProdIn += sh->fSt.workShop.nProdIn;
-    sh->fSt.workShop.nProdIn = 0;
-    sh->fSt.shop.prodTransfer = false;
+    sh->fSt.st.entrepStat = COLLECTING_A_BATCH_OF_PRODUCTS; //change state
+    sh->fSt.shop.nProdIn += sh->fSt.workShop.nProdIn; // added to products in shop the products in the workshop
+    sh->fSt.workShop.nProdIn = 0; // all products are now in the shop
+    sh->fSt.shop.prodTransfer = false; // reset flag
     saveState(nFic, &(sh->fSt));
 
     if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
@@ -472,17 +472,17 @@ static void visitSuppliers(void) {
     /* insert your code here */
     unsigned int craftmenCounter;
 
-    sh->fSt.st.entrepStat = DELIVERING_PRIME_MATERIALS;
-    sh->fSt.shop.primeMatReq = false;
+    sh->fSt.st.entrepStat = DELIVERING_PRIME_MATERIALS; // change state
+    sh->fSt.shop.primeMatReq = false; // reset flag
 
-    if (sh->fSt.workShop.NSPMat < NP) {
-        sh->fSt.workShop.nPMatIn += sh->fSt.primeMaterials[sh->fSt.workShop.NSPMat];
-        sh->fSt.workShop.NTPMat += sh->fSt.primeMaterials[sh->fSt.workShop.NSPMat++];
+    if (sh->fSt.workShop.NSPMat < NP) { // if we havent supplied the max times materials are supplied
+        sh->fSt.workShop.nPMatIn += sh->fSt.primeMaterials[sh->fSt.workShop.NSPMat]; // add colected materials to the workshop
+        sh->fSt.workShop.NTPMat += sh->fSt.primeMaterials[sh->fSt.workShop.NSPMat++]; // add to total amount of supplied materials and then increase index to next time
     }
 
     craftmenCounter = 0;
 
-    while (sh->nCraftsmenBlk > craftmenCounter) { // while there are blocked craftsman continue to unblock
+    while (sh->nCraftsmenBlk > craftmenCounter) { // while there are blocked craftsman continue to unlock
         // fazer nCraftsmenBlk n vezes up a um semaforo
         if (semUp(semgid, sh->waitForMaterials) == -1) {
             perror("visitSuppliers() error during semUP waiting for materials");
@@ -513,7 +513,7 @@ static void returnToShop(void) {
     }
 
     /* insert your code here */
-    sh->fSt.st.entrepStat = OPENING_THE_SHOP;
+    sh->fSt.st.entrepStat = OPENING_THE_SHOP; // change state
     saveState(nFic, &(sh->fSt));
 
     if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
