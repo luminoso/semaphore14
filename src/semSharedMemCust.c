@@ -170,7 +170,7 @@ static void goShopping(unsigned int custId) {
     }
 
     /* insert your code here */
-    sh->fSt.st.custStat[custId].stat = CHECKING_SHOP_DOOR_OPEN;
+    sh->fSt.st.custStat[custId].stat = CHECKING_SHOP_DOOR_OPEN; // change state
     saveState(nFic,&(sh->fSt));
 
 
@@ -213,7 +213,7 @@ static bool isDoorOpen(unsigned int custId) {
 static void tryAgainLater(unsigned int custId) {
 
     /* insert your code here */
-    sh->fSt.st.custStat[custId].stat = CARRYING_OUT_DAILY_CHORES;
+    sh->fSt.st.custStat[custId].stat = CARRYING_OUT_DAILY_CHORES; // change the state
     saveState(nFic,&(sh->fSt));
 
     if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
@@ -234,7 +234,7 @@ static void enterShop(unsigned int custId) {
 
     /* insert your code here */
     sh->fSt.st.custStat[custId].stat = APPRAISING_OFFER_IN_DISPLAY;
-    sh->fSt.shop.nCustIn++;
+    sh->fSt.shop.nCustIn++; // one more customer in the shop
     saveState(nFic,&(sh->fSt));
     
     if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
@@ -261,13 +261,13 @@ static unsigned int perusingAround(unsigned int custId) {
     }
     
     /* insert your code here */
-    unsigned int nProd = 0;
+    unsigned int nProd = 0; // number of pieces picked up
     
-    if (sh->fSt.shop.nProdIn > 0)
-        nProd = pickUp();
+    if (sh->fSt.shop.nProdIn > 0) // is there anything to buy?
+        nProd = pickUp(); // randomly pick something or not
     
     if(nProd != 0){
-        sh->fSt.shop.nProdIn -= nProd;
+        sh->fSt.shop.nProdIn -= nProd; // customer picked nProd pieces
         saveState (nFic, &(sh->fSt));
     }
     
@@ -295,9 +295,9 @@ static void iWantThis(unsigned int custId, unsigned int nGoods) {
     }
 
     /* insert your code here */
-    sh->fSt.st.custStat[custId].stat = BUYING_SOME_GOODS;
-    sh->fSt.st.custStat[custId].boughtPieces += nGoods;
-    queueIn(&(sh->fSt.shop.queue), custId);
+    sh->fSt.st.custStat[custId].stat = BUYING_SOME_GOODS; // change the state
+    sh->fSt.st.custStat[custId].boughtPieces += nGoods; // number of goods to buy
+    queueIn(&(sh->fSt.shop.queue), custId); // go to the buying queue
 
     if (semUp (semgid, sh->proceed) == -1){
         perror("error on executing the up operation for semaphore proceed");
@@ -333,8 +333,8 @@ static void exitShop(unsigned int custId) {
     }
 
     /* insert your code here */
-    sh->fSt.st.custStat[custId].stat = CARRYING_OUT_DAILY_CHORES;
-    sh->fSt.shop.nCustIn--;
+    sh->fSt.st.custStat[custId].stat = CARRYING_OUT_DAILY_CHORES; // state change
+    sh->fSt.shop.nCustIn--; // one less customer inside the shop
 
     if (semUp (semgid, sh->proceed) == -1){
         perror("error on executing the up operation for semaphore proceed");
