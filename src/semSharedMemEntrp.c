@@ -220,7 +220,7 @@ static char appraiseSit(void) {
     }
 
     /* insert your code here */
-    char nextTask;
+    char nextTask; // control what the next state is going to be
 
     while(true){
         if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
@@ -239,17 +239,17 @@ static char appraiseSit(void) {
         }
 
         if (!queueEmpty(&sh->fSt.shop.queue)) {
-            nextTask = 'C';
+            nextTask = 'C'; // attend the customer
             break;
         }
         
         if (sh->fSt.shop.primeMatReq) {
-            nextTask = 'P';
+            nextTask = 'P'; // prime materials needed
             break;
         }
         
         if (sh->fSt.shop.prodTransfer) {
-            nextTask = 'G';
+            nextTask = 'G'; // go to workshop collect pieces
             break;
         }
 
@@ -261,7 +261,7 @@ static char appraiseSit(void) {
                 (sh->fSt.workShop.nPMatIn == 0) && /* all prime materials at the workshop have been spent and */
                 (sh->fSt.workShop.NSPMat == NP) && /* all the delivers of prime materials have been carried out and */
                 (sh->fSt.workShop.NTPMat == PP * sh->fSt.workShop.NTProd)) {
-            nextTask = 'E';
+            nextTask = 'E'; // nothing more to do
             break;
         }
     }
@@ -296,14 +296,14 @@ static unsigned int addressACustomer(void) {
 
     unsigned int customerIdx; // customer id 
 
-    sh->fSt.st.entrepStat = ATTENDING_A_CUSTOMER;
+    sh->fSt.st.entrepStat = ATTENDING_A_CUSTOMER; // change state
     
     if (queueEmpty(&(sh->fSt.shop.queue))) {
         perror("addressACustomer() - there is no customers in the queue");
         exit(EXIT_FAILURE);
     }
 
-    queueOut(&(sh->fSt.shop.queue), &customerIdx);
+    queueOut(&(sh->fSt.shop.queue), &customerIdx); // retrieve a value from the queue to customerIdx
 
     if (customerIdx >= N) {
         perror("addressACustomer() - customer ID is inconsistent");
@@ -317,7 +317,7 @@ static unsigned int addressACustomer(void) {
         exit(EXIT_FAILURE);
     }
 
-    return customerIdx;
+    return customerIdx; // return the if of the attended customer
 }
 
 /**
@@ -370,8 +370,9 @@ static bool customersInTheShop(void) {
     }
 
     /* insert your code here */
-    bool customersInside;
-    customersInside = sh->fSt.shop.nCustIn != 0;
+    bool customersInside; // control variable if there are customers in the shop
+    
+    customersInside = sh->fSt.shop.nCustIn != 0; // check clients in the shop status
 
     if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
         perror("error on executing the up operation for semaphore access");
@@ -394,7 +395,7 @@ static void closeTheDoor(void) {
     }
 
     /* insert your code here */
-    sh->fSt.shop.stat = SDCLOSED;
+    sh->fSt.shop.stat = SDCLOSED; // state change
     saveState(nFic, &(sh->fSt));
 
     if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
@@ -474,15 +475,15 @@ static void visitSuppliers(void) {
     sh->fSt.st.entrepStat = DELIVERING_PRIME_MATERIALS;
     sh->fSt.shop.primeMatReq = false;
 
-    if (sh->fSt.workShop.NSPMat < NP) { // <= ou <
+    if (sh->fSt.workShop.NSPMat < NP) {
         sh->fSt.workShop.nPMatIn += sh->fSt.primeMaterials[sh->fSt.workShop.NSPMat];
         sh->fSt.workShop.NTPMat += sh->fSt.primeMaterials[sh->fSt.workShop.NSPMat++];
     }
 
     craftmenCounter = 0;
 
-    while (sh->nCraftsmenBlk > craftmenCounter) {
-        // fazer nCraftsmenBlk vezes up a um semaforo?
+    while (sh->nCraftsmenBlk > craftmenCounter) { // while there are blocked craftsman continue to unblock
+        // fazer nCraftsmenBlk n vezes up a um semaforo
         if (semUp(semgid, sh->waitForMaterials) == -1) {
             perror("visitSuppliers() error during semUP waiting for materials");
             exit(EXIT_FAILURE);
@@ -490,7 +491,7 @@ static void visitSuppliers(void) {
         craftmenCounter++;
     }
 
-    sh->nCraftsmenBlk = 0;
+    sh->nCraftsmenBlk = 0; // there isn't any more Blk craftsman
     saveState(nFic, &(sh->fSt));
 
     if (semUp(semgid, sh->access) == -1) /* exit critical region */ {
